@@ -1,6 +1,8 @@
 import { Box, Avatar, Typography, TextField, IconButton, useTheme } from '@mui/material'
 import { Search, MoreVert } from '@mui/icons-material'
 import { useState } from 'react'
+import ThemeToggle from '../components/ToggleTheme'
+
 
  const Navbar = ({ selectedChat }) => {
   const theme = useTheme()
@@ -73,7 +75,7 @@ import { useState } from 'react'
 
     searchField: {
       '& .MuiOutlinedInput-root': {
-        borderRadius: theme.shape.borderRadius,
+        borderRadius: theme.spacing(1.25),
         backgroundColor: theme.palette.background.default,
         transition: 'all 0.2s ease',
 
@@ -153,6 +155,8 @@ import { useState } from 'react'
             <Search />
           </IconButton>
         )}
+
+         <ThemeToggle />
 
         <IconButton
           size="small"

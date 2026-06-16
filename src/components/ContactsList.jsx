@@ -33,7 +33,7 @@ const ContactsList = () => {
     },
 
     header: {
-      padding: theme.spacing(2.5, 3),
+      padding: theme.spacing(1, 2),
       backgroundColor: theme.palette.background.paper,
       borderBottom: `1px solid ${theme.palette.divider}`
     },
@@ -53,13 +53,13 @@ const ContactsList = () => {
 
     searchField: {
       '& .MuiOutlinedInput-root': {
-        borderRadius: 20,
+        borderRadius: theme.spacing(1.25),
         backgroundColor: theme.palette.background.default,
         transition: 'all 0.2s ease',
 
         '&:hover': {
-          backgroundColor: theme.palette.mode === 'light' 
-            ? 'rgba(59, 130, 246, 0.05)' 
+          backgroundColor: theme.palette.mode === 'light'
+            ? 'rgba(59, 130, 246, 0.05)'
             : 'rgba(59, 130, 246, 0.1)'
         }
       }
@@ -99,9 +99,9 @@ const ContactsList = () => {
     },
 
     content: {
-      flex: 1,
-      overflowY: 'auto',
-      padding: theme.spacing(3),
+      // flex: 1,
+      // overflowY: 'auto',
+      padding: theme.spacing(2),
 
       '&::-webkit-scrollbar': {
         width: '6px'
@@ -118,8 +118,16 @@ const ContactsList = () => {
     },
 
     section: {
-      marginBottom: theme.spacing(3)
+      marginBottom: theme.spacing(2),
+
     },
+     section2: {
+      marginBottom: theme.spacing(2),
+      overflowY: 'auto',
+      height: 'calc(50vh - 200px)',
+
+    },
+
 
     sectionTitle: {
       fontSize: '12px',
@@ -135,12 +143,12 @@ const ContactsList = () => {
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
       gap: theme.spacing(2),
-      marginBottom: theme.spacing(3)
+      marginBottom: theme.spacing(2)
     },
 
     favoriteCard: {
       padding: theme.spacing(2),
-      borderRadius: theme.shape.borderRadius,
+      borderRadius: theme.spacing(1.25),
       backgroundColor: theme.palette.background.paper,
       border: `1px solid ${theme.palette.divider}`,
       cursor: 'pointer',
@@ -148,8 +156,8 @@ const ContactsList = () => {
       textAlign: 'center',
 
       '&:hover': {
-        backgroundColor: theme.palette.mode === 'light' 
-          ? 'rgba(59, 130, 246, 0.05)' 
+        backgroundColor: theme.palette.mode === 'light'
+          ? 'rgba(59, 130, 246, 0.05)'
           : theme.palette.action.hover,
         borderColor: theme.palette.primary.main
       }
@@ -160,9 +168,10 @@ const ContactsList = () => {
       alignItems: 'center',
       gap: theme.spacing(2),
       padding: theme.spacing(1.5),
-      borderRadius: theme.shape.borderRadius,
+      borderRadius: theme.spacing(1.25),
       cursor: 'pointer',
       transition: 'all 0.2s ease',
+
 
       '&:hover': {
         backgroundColor: theme.palette.action.hover
@@ -294,10 +303,11 @@ const ContactsList = () => {
         </Box>
 
         {/* All Contacts Section */}
-        <Box sx={styles.section}>
-          <Typography sx={styles.sectionTitle}>
+         <Typography sx={styles.sectionTitle}>
             All Contacts ({CONTACTS_DATA.length} total)
           </Typography>
+        <Box sx={styles.section2}>
+         
           {CONTACTS_DATA.map((contact) => (
             <Box key={contact.id} sx={styles.contactItem}>
               <Badge
@@ -326,10 +336,10 @@ const ContactsList = () => {
               </Box>
             </Box>
           ))}
-          <Button sx={styles.loadMoreButton}>
+        </Box>
+         <Button sx={styles.loadMoreButton}>
             Load more contacts
           </Button>
-        </Box>
       </Box>
     </Box>
   )

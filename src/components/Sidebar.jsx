@@ -34,7 +34,7 @@ const NAV_ITEMS = [
   { icon: MessageSquarePlus, label: 'Chats', id: 'chats' },
   { icon: Contact, label: 'Contacts', id: 'contacts' },
   { icon: Settings, label: 'Settings', id: 'settings' },
-  { icon: Archive, label: 'Archive', id: 'archive' },
+  // { icon: Archive, label: 'Archive', id: 'archive' },
 ]
 
 // ─── COMPONENT ────────────────────────────
@@ -66,7 +66,7 @@ const Sidebar = ({ onSelectChat, onTabChange }) => {
     },
     
     header: {
-      padding: theme.spacing(2),
+      padding: theme.spacing(1),
       borderBottom: `1px solid ${theme.palette.divider}`,
       backgroundColor: theme.palette.background.paper
     },
@@ -75,7 +75,7 @@ const Sidebar = ({ onSelectChat, onTabChange }) => {
       fontWeight: 700,
       fontSize: '18px',
       color: theme.palette.text.primary,
-      marginBottom: theme.spacing(2),
+      marginBottom: theme.spacing(1),
       letterSpacing: '-0.5px'
     },
     
@@ -103,11 +103,11 @@ const Sidebar = ({ onSelectChat, onTabChange }) => {
       padding: theme.spacing(1),
       display: 'flex',
       flexDirection: 'column',
-      gap: theme.spacing(0.5)
+      gap: theme.spacing(0.5),
     },
     
     navButton: {
-      borderRadius: theme.shape.borderRadius,
+      borderRadius: "10px",
       padding: `${theme.spacing(1.5)} ${theme.spacing(2)}`,
       marginBottom: 0,
       transition: 'all 0.2s ease',
@@ -168,7 +168,7 @@ const Sidebar = ({ onSelectChat, onTabChange }) => {
     },
     
     chatItem: {
-      borderRadius: theme.shape.borderRadius,
+      borderRadius: "10px",
       marginBottom: theme.spacing(1),
       padding: theme.spacing(1.5),
       transition: 'all 0.2s ease',
@@ -241,11 +241,11 @@ const Sidebar = ({ onSelectChat, onTabChange }) => {
     },
     
     footer: {
-      padding: theme.spacing(2),
+      padding: theme.spacing(1),
       borderTop: `1px solid ${theme.palette.divider}`,
       display: 'flex',
       flexDirection: 'column',
-      gap: theme.spacing(1.5),
+      gap: theme.spacing(0.5),
       backgroundColor: theme.palette.background.paper
     },
     
@@ -254,7 +254,7 @@ const Sidebar = ({ onSelectChat, onTabChange }) => {
       textTransform: 'none',
       fontWeight: 600,
       fontSize: '14px',
-      padding: `${theme.spacing(1.5)} ${theme.spacing(2)}`,
+      padding: `${theme.spacing(1)} ${theme.spacing(1)}`,
       transition: 'all 0.2s ease',
       
       '&:hover': {
@@ -313,10 +313,11 @@ const Sidebar = ({ onSelectChat, onTabChange }) => {
       </Box>
 
       {/* ── CONVERSATIONS LIST ─────────── */}
-      <Box sx={styles.conversationsContainer}>
-        <Typography sx={styles.conversationsHeader}>
+      <Typography sx={styles.conversationsHeader}>
           Recent Conversations
         </Typography>
+      <Box sx={styles.conversationsContainer}>
+        
         {CONVERSATIONS.map((chat, index) => (
           <ListItemButton
             key={chat.id}

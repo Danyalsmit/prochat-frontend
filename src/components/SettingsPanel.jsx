@@ -74,7 +74,7 @@ const SettingsPanel = () => {
     card: {
       backgroundColor: theme.palette.background.paper,
       border: `1px solid ${theme.palette.divider}`,
-      borderRadius: theme.shape.borderRadius,
+      // borderRadius: theme.shape.borderRadius,
       padding: theme.spacing(2)
     },
 
@@ -98,7 +98,7 @@ const SettingsPanel = () => {
 
     textField: {
       '& .MuiOutlinedInput-root': {
-        borderRadius: theme.shape.borderRadius,
+        borderRadius: theme.spacing(1.25),
         backgroundColor: theme.palette.background.default,
 
         '&:hover': {
@@ -143,7 +143,7 @@ const SettingsPanel = () => {
       backgroundColor: theme.palette.primary.main,
       color: theme.palette.primary.contrastText,
       padding: theme.spacing(2.5),
-      borderRadius: theme.shape.borderRadius,
+      borderRadius: theme.spacing(1.25),
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between'
@@ -153,7 +153,7 @@ const SettingsPanel = () => {
       backgroundColor: theme.palette.error.main + '10',
       border: `1px solid ${theme.palette.error.main}30`,
       padding: theme.spacing(2),
-      borderRadius: theme.shape.borderRadius
+      // borderRadius: theme.shape.borderRadius
     },
 
     dangerTitle: {

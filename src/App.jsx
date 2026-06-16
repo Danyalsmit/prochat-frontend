@@ -19,6 +19,7 @@ import { ROUTES } from './constants/routes'
 import { useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 
+
 // Lazy loading — production performance
 const Login     = lazy(() => import('./pages/Login/index'))
 const Register  = lazy(() => import('./pages/Register/index'))

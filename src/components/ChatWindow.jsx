@@ -209,7 +209,7 @@ const ChatWindow = ({ selectedChat }) => {
 
     inputField: {
       '& .MuiOutlinedInput-root': {
-        borderRadius: 20,
+        borderRadius: theme.spacing(1.25),
         backgroundColor: theme.palette.background.default,
         transition: 'all 0.2s ease',
 
