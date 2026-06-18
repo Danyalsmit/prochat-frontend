@@ -1,14 +1,3 @@
-// import { useState } from 'react'
-// import ThemeToggle from './components/ToggleTheme'
-// import './App.css'
-
-// function App() {
-//   return (
-//     <>
-//       <ThemeToggle />
-//     </>
-//   )
-// }
 
 // export default App
 import { Routes, Route, Navigate } from 'react-router-dom'
