@@ -70,14 +70,15 @@ const App = () => {
           />
 
           {/* Protected Routes */}
-          <Route
+          {/* <Route
             path={ROUTES.DASHBOARD}
             element={
               // <ProtectedRoute>
                 <Dashboard />
               // </ProtectedRoute>
             }
-          />
+          /> */}
+          <Route path="/dashboard" element={<Dashboard />} />
 
           {/* 404 — koi bhi unknown route */}
           <Route
