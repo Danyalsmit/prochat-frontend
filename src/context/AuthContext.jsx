@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react'
+import api from '../api/axiosInstance'
 
 export const AuthContext = createContext()
 
@@ -24,7 +25,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', authToken)
   }
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout')
+    } catch (err) {
+      console.warn('Logout request failed:', err)
+    }
+
     setUser(null)
     setToken(null)
     localStorage.clear()

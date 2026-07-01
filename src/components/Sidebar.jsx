@@ -1,50 +1,73 @@
 import { Box, Avatar, Typography, Button, ListItemButton, Badge, useTheme } from '@mui/material'
-import { MessageSquarePlus, Contact, Settings, Archive, HelpCircle } from 'lucide-react'
-import { useState } from 'react'
-
-// ─── MOCK DATA ────────────────────────────
-const CONVERSATIONS = [
-  { 
-    id: 1, 
-    name: 'John Doe', 
-    message: 'Hey! Do you have a chance to look at the quarterly report I sent over last morning?', 
-    time: '10:42 AM', 
-    avatar: 'JD', 
-    online: true 
-  },
-  { 
-    id: 2, 
-    name: 'Team Sync', 
-    message: 'Sarah: The presentation looks...', 
-    time: '9:15 AM', 
-    avatar: 'TS', 
-    online: false 
-  },
-  { 
-    id: 3, 
-    name: 'Project Alpha', 
-    message: 'You: Please check the revised...', 
-    time: 'Yesterday', 
-    avatar: 'PA', 
-    online: false 
-  },
-]
+import { MessageSquarePlus, Contact, Settings, HelpCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useAuth } from '../context/AuthContext'
+import api from '../api/axiosInstance'
 
 const NAV_ITEMS = [
   { icon: MessageSquarePlus, label: 'Chats', id: 'chats' },
   { icon: Contact, label: 'Contacts', id: 'contacts' },
   { icon: Settings, label: 'Settings', id: 'settings' },
-  // { icon: Archive, label: 'Archive', id: 'archive' },
 ]
 
-// ─── COMPONENT ────────────────────────────
 const Sidebar = ({ onSelectChat, onTabChange }) => {
   const theme = useTheme()
-  const [selectedChat, setSelectedChat] = useState(0)
+  const { user } = useAuth()
+  const [chats, setChats] = useState([])
+  const [selectedChatIndex, setSelectedChatIndex] = useState(null)
   const [activeTab, setActiveTab] = useState('chats')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!user) return
+    const fetchChats = async () => {
+      try {
+        setLoading(true)
+        const res = await api.get('/chat/my-chats')
+        setChats(res.data.data || [])
+      } catch (err) {
+        setError(err?.response?.data?.message || 'Unable to load chats')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchChats()
+  }, [user])
+
+  const getChatName = (chat) => {
+    if (!chat) return 'Chat'
+    if (chat.isGroupChat && chat.chatName) return chat.chatName
+    const partner = chat.participants?.find((participant) => participant._id !== user?._id)
+    return partner?.fullName || chat.chatName || 'Direct Chat'
+  }
+
+  const getChatPreview = (chat) => {
+    if (!chat) return ''
+    return chat.latestMessage?.content || 'No messages yet'
+  }
+
+  const getChatTime = (chat) => {
+    if (!chat) return ''
+    return chat.latestMessage?.createdAt
+      ? new Date(chat.latestMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : 'Now'
+  }
+
+  const getAvatarLetters = (chat) => {
+    const name = getChatName(chat)
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase()
+  }
 
   const handleSelectChat = (chat, index) => {
-    setSelectedChat(index)
+    setSelectedChatIndex(index)
     onSelectChat(chat)
   }
 
@@ -317,11 +340,28 @@ const Sidebar = ({ onSelectChat, onTabChange }) => {
           Recent Conversations
         </Typography>
       <Box sx={styles.conversationsContainer}>
-        
-        {CONVERSATIONS.map((chat, index) => (
+        {loading && (
+          <Typography sx={{ color: theme.palette.text.secondary, padding: theme.spacing(2) }}>
+            Loading chats...
+          </Typography>
+        )}
+
+        {error && (
+          <Typography color="error" sx={{ padding: theme.spacing(2) }}>
+            {error}
+          </Typography>
+        )}
+
+        {!loading && chats.length === 0 && (
+          <Typography sx={{ color: theme.palette.text.secondary, padding: theme.spacing(2) }}>
+            No chats found yet. Start a conversation from Contacts.
+          </Typography>
+        )}
+
+        {chats.map((chat, index) => (
           <ListItemButton
-            key={chat.id}
-            selected={selectedChat === index}
+            key={chat._id}
+            selected={selectedChatIndex === index}
             onClick={() => handleSelectChat(chat, index)}
             sx={styles.chatItem}
           >
@@ -334,26 +374,26 @@ const Sidebar = ({ onSelectChat, onTabChange }) => {
                   ...styles.chatBadge,
                   '& .MuiBadge-badge': {
                     ...styles.chatBadge['& .MuiBadge-badge'],
-                    backgroundColor: chat.online ? '#10b981' : '#d1d5db'
+                    backgroundColor: '#10b981'
                   }
                 }}
               >
                 <Avatar sx={styles.chatAvatar}>
-                  {chat.avatar}
+                  {getAvatarLetters(chat)}
                 </Avatar>
               </Badge>
 
               <Box sx={styles.chatInfo}>
                 <Box sx={styles.chatHeader}>
                   <Typography sx={styles.chatName}>
-                    {chat.name}
+                    {getChatName(chat)}
                   </Typography>
                   <Typography sx={styles.chatTime}>
-                    {chat.time}
+                    {getChatTime(chat)}
                   </Typography>
                 </Box>
                 <Typography sx={styles.chatPreview}>
-                  {chat.message}
+                  {getChatPreview(chat)}
                 </Typography>
               </Box>
             </Box>

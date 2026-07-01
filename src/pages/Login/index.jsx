@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Box, Card, CardContent } from '@mui/material'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import api from '../../api/axiosInstance'
 import { ROUTES } from '../../constants/routes'
 import toast from 'react-hot-toast'
 import { loginStyles } from './loginStyles'
@@ -38,17 +39,14 @@ const Login = () => {
     }
     try {
       setLoading(true)
-      // Real API call will go here
-      // const res = await api.post('/auth/login', form)
-      // login(res.data.user, res.data.token)
-
-      // Dummy login for now
-      await new Promise(r => setTimeout(r, 1500))
-      login({ name: 'Danyal Khan', email: form.email }, 'dummy-token')
+      const res = await api.post('/auth/login', form)
+      const user = res.data.data.user
+      const authToken = res.data.data.token
+      login(user, authToken)
       toast.success('Welcome back! 👋')
       navigate(from, { replace: true })
     } catch (err) {
-      setError('Invalid email or password')
+      setError(err?.response?.data?.message || 'Invalid email or password')
       toast.error('Login failed!')
     } finally {
       setLoading(false)

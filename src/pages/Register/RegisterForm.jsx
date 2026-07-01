@@ -12,6 +12,7 @@ import {
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import api from '../../api/axiosInstance'
 import { ROUTES } from '../../constants/routes'
 import { styles } from './registerStyles'
 import toast from 'react-hot-toast'
@@ -63,16 +64,22 @@ const RegisterForm = () => {
 
     try {
       setLoading(true)
-      // Baad mein real API call aayegi
-      // const res = await api.post('/auth/register', form)
-      // login(res.data.user, res.data.token)
+      const payload = new FormData()
+      payload.append('fullName', form.fullName)
+      payload.append('email', form.email)
+      payload.append('password', form.password)
 
-      await new Promise(r => setTimeout(r, 1500))
-      login({ name: form.fullName, email: form.email }, 'dummy-token')
+      const res = await api.post('/auth/signup', payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
+      const user = res.data.data
+      const authToken = res.data.data.token || localStorage.getItem('token')
+      login(user, authToken)
       toast.success('Account created successfully! 🎉')
       navigate(ROUTES.DASHBOARD)
     } catch (err) {
-      setError('Registration failed. Please try again.')
+      setError(err?.response?.data?.message || 'Registration failed. Please try again.')
       toast.error('Registration failed!')
     } finally {
       setLoading(false)

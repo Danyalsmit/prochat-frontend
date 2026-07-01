@@ -76,7 +76,7 @@ const CHAT_MESSAGES = {
     {
       id: 2,
       sender: 'You',
-      content: 'I\'ll review them today and send feedback',
+      content: "I'll review them today and send feedback",
       timestamp: 'Yesterday',
       isOwn: true,
       avatar: 'You'
@@ -88,10 +88,35 @@ const ChatWindow = ({ selectedChat }) => {
   const theme = useTheme()
   const [message, setMessage] = useState('')
 
-  // Get messages for selected chat, fallback to empty array
-  const currentMessages = CHAT_MESSAGES[selectedChat?.name] || []
+  if (!selectedChat) {
+    return (
+      <Box
+        sx={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: theme.palette.background.default,
+          color: theme.palette.text.secondary,
+          padding: theme.spacing(4),
+          textAlign: 'center'
+        }}
+      >
+        <Box>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Select a chat to start messaging
+          </Typography>
+          <Typography>
+            Your recent conversations will appear in the sidebar. Pick a chat to view messages.
+          </Typography>
+        </Box>
+      </Box>
+    )
+  }
 
-  // ─── DYNAMIC STYLES USING THEME ────────────
+  const chatTitle = selectedChat.chatName || selectedChat.name || 'Chat'
+  const currentMessages = CHAT_MESSAGES[chatTitle] || []
+
   const styles = {
     root: {
       flex: 1,
@@ -99,6 +124,31 @@ const ChatWindow = ({ selectedChat }) => {
       flexDirection: 'column',
       backgroundColor: theme.palette.background.default,
       transition: 'all 0.3s ease'
+    },
+
+    header: {
+      padding: theme.spacing(2, 3),
+      borderBottom: `1px solid ${theme.palette.divider}`,
+      backgroundColor: theme.palette.background.paper,
+      display: 'flex',
+      alignItems: 'center',
+      gap: theme.spacing(2)
+    },
+
+    headerText: {
+      display: 'flex',
+      flexDirection: 'column'
+    },
+
+    headerName: {
+      fontSize: '16px',
+      fontWeight: 700,
+      color: theme.palette.text.primary
+    },
+
+    headerDetail: {
+      fontSize: '12px',
+      color: theme.palette.text.secondary
     },
 
     messagesContainer: {
@@ -176,12 +226,11 @@ const ChatWindow = ({ selectedChat }) => {
     },
 
     messageBubbleOther: {
-      backgroundColor: theme.palette.mode === 'light' 
-        ? '#f3f4f6' 
+      backgroundColor: theme.palette.mode === 'light'
+        ? '#f3f4f6'
         : theme.palette.action.hover,
       color: theme.palette.text.primary,
       borderBottomLeftRadius: 4,
-     
     },
 
     messageContent: {
@@ -214,8 +263,8 @@ const ChatWindow = ({ selectedChat }) => {
         transition: 'all 0.2s ease',
 
         '&:hover': {
-          backgroundColor: theme.palette.mode === 'light' 
-            ? 'rgba(59, 130, 246, 0.05)' 
+          backgroundColor: theme.palette.mode === 'light'
+            ? 'rgba(59, 130, 246, 0.05)'
             : 'rgba(59, 130, 246, 0.1)'
         },
 
@@ -274,46 +323,70 @@ const ChatWindow = ({ selectedChat }) => {
 
   return (
     <Box sx={styles.root}>
-      {/* ── MESSAGES AREA ───────────────── */}
-      <Box sx={styles.messagesContainer}>
-        {currentMessages.map((msg) => (
-          <Box
-            key={msg.id}
-            sx={{
-              ...styles.messageWrapper,
-              ...(msg.isOwn ? styles.messageWrapperOwn : styles.messageWrapperOther)
-            }}
-          >
-            {!msg.isOwn && (
-              <Avatar sx={{ ...styles.avatar, ...styles.avatarOther }}>
-                {msg.avatar}
-              </Avatar>
-            )}
-
-            <Box
-              sx={{
-                ...styles.messageBubble,
-                ...(msg.isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther)
-              }}
-            >
-              <Typography sx={styles.messageContent}>
-                {msg.content}
-              </Typography>
-              <Typography sx={styles.messageTimestamp}>
-                {msg.timestamp}
-              </Typography>
-            </Box>
-
-            {msg.isOwn && (
-              <Avatar sx={{ ...styles.avatar, ...styles.avatarOwn }}>
-                {msg.avatar}
-              </Avatar>
-            )}
-          </Box>
-        ))}
+      <Box sx={styles.header}>
+        <Avatar sx={{ width: 48, height: 48, backgroundColor: theme.palette.primary.main }}>
+          {chatTitle
+            .split(' ')
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((item) => item[0])
+            .join('')
+            .toUpperCase()}
+        </Avatar>
+        <Box sx={styles.headerText}>
+          <Typography sx={styles.headerName}>{chatTitle}</Typography>
+          <Typography sx={styles.headerDetail}>
+            {selectedChat.participants?.length > 1
+              ? `${selectedChat.participants.length} participants`
+              : 'Direct message'}
+          </Typography>
+        </Box>
       </Box>
 
-      {/* ── INPUT AREA ──────────────────── */}
+      <Box sx={styles.messagesContainer}>
+        {currentMessages.length === 0 ? (
+          <Typography sx={{ color: theme.palette.text.secondary }}>
+            No messages yet. Start the conversation by typing below.
+          </Typography>
+        ) : (
+          currentMessages.map((msg) => (
+            <Box
+              key={msg.id}
+              sx={{
+                ...styles.messageWrapper,
+                ...(msg.isOwn ? styles.messageWrapperOwn : styles.messageWrapperOther)
+              }}
+            >
+              {!msg.isOwn && (
+                <Avatar sx={{ ...styles.avatar, ...styles.avatarOther }}>
+                  {msg.avatar}
+                </Avatar>
+              )}
+
+              <Box
+                sx={{
+                  ...styles.messageBubble,
+                  ...(msg.isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther)
+                }}
+              >
+                <Typography sx={styles.messageContent}>
+                  {msg.content}
+                </Typography>
+                <Typography sx={styles.messageTimestamp}>
+                  {msg.timestamp}
+                </Typography>
+              </Box>
+
+              {msg.isOwn && (
+                <Avatar sx={{ ...styles.avatar, ...styles.avatarOwn }}>
+                  {msg.avatar}
+                </Avatar>
+              )}
+            </Box>
+          ))
+        )}
+      </Box>
+
       <Box sx={styles.inputArea}>
         <IconButton size="small" sx={styles.actionButton}>
           <Smile size={20} />
@@ -349,5 +422,3 @@ const ChatWindow = ({ selectedChat }) => {
 }
 
 export default ChatWindow
-
- 

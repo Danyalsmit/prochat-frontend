@@ -7,11 +7,7 @@ import ContactsList from '../components/ContactsList'
 import SettingsPanel from '../components/SettingsPanel'
 
 const Dashboard = () => {
-  const [selectedChat, setSelectedChat] = useState({
-    name: 'John Doe',
-    status: 'Direct',
-    avatar: 'JD'
-  })
+  const [selectedChat, setSelectedChat] = useState(null)
   const [activeTab, setActiveTab] = useState('chats')
 
   const handleTabChange = (tabId) => {

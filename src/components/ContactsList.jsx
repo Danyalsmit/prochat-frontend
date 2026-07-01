@@ -1,27 +1,15 @@
-import { Box, TextField, Typography, Avatar, Button, Tab, Tabs, InputAdornment, useTheme, Card, Badge } from '@mui/material'
+import { Box, TextField, Typography, Avatar, Button, Tab, Tabs, InputAdornment, useTheme, Badge } from '@mui/material'
 import { Search, UserPlus } from 'lucide-react'
-import { useState } from 'react'
-
-const CONTACTS_DATA = [
-  { id: 1, name: 'Alex Rivers', role: 'Project Manager', avatar: 'AR', online: true },
-  { id: 2, name: 'Sarah Chen', role: 'Product Manager', avatar: 'SC', online: true },
-  { id: 3, name: 'Marcus Tsoi', role: 'Software Engineer', avatar: 'MT', online: false },
-  { id: 4, name: 'Adrian Fletcher', role: 'Active now', avatar: 'AF', online: true },
-  { id: 5, name: 'Beatrix Thorne', role: 'Offline since 3h', avatar: 'BT', online: false },
-  { id: 6, name: 'Caleb Jensen', role: 'Active now', avatar: 'CJ', online: true },
-  { id: 7, name: 'Dania Petrov', role: 'Away', avatar: 'DP', online: false },
-]
-
-const FAVORITES = [
-  { id: 1, name: 'Alex Rivers', role: 'Project Manager', avatar: 'AR', online: true },
-  { id: 2, name: 'Sarah Chen', role: 'Product Manager', avatar: 'SC', online: true },
-  { id: 3, name: 'Marcus Tsoi', role: 'Software Engineer', avatar: 'MT', online: false },
-]
+import { useState, useEffect } from 'react'
+import api from '../api/axiosInstance'
 
 const ContactsList = () => {
   const theme = useTheme()
   const [tabValue, setTabValue] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
+  const [contacts, setContacts] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const styles = {
     root: {
@@ -99,8 +87,6 @@ const ContactsList = () => {
     },
 
     content: {
-      // flex: 1,
-      // overflowY: 'auto',
       padding: theme.spacing(2),
 
       '&::-webkit-scrollbar': {
@@ -117,17 +103,11 @@ const ContactsList = () => {
       }
     },
 
-    section: {
-      marginBottom: theme.spacing(2),
-
-    },
-     section2: {
+    section2: {
       marginBottom: theme.spacing(2),
       overflowY: 'auto',
-      height: 'calc(50vh - 200px)',
-
+      height: 'calc(55vh - 160px)'
     },
-
 
     sectionTitle: {
       fontSize: '12px',
@@ -139,30 +119,6 @@ const ContactsList = () => {
       paddingLeft: theme.spacing(1)
     },
 
-    favoritesContainer: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-      gap: theme.spacing(2),
-      marginBottom: theme.spacing(2)
-    },
-
-    favoriteCard: {
-      padding: theme.spacing(2),
-      borderRadius: theme.spacing(1.25),
-      backgroundColor: theme.palette.background.paper,
-      border: `1px solid ${theme.palette.divider}`,
-      cursor: 'pointer',
-      transition: 'all 0.2s ease',
-      textAlign: 'center',
-
-      '&:hover': {
-        backgroundColor: theme.palette.mode === 'light'
-          ? 'rgba(59, 130, 246, 0.05)'
-          : theme.palette.action.hover,
-        borderColor: theme.palette.primary.main
-      }
-    },
-
     contactItem: {
       display: 'flex',
       alignItems: 'center',
@@ -171,7 +127,8 @@ const ContactsList = () => {
       borderRadius: theme.spacing(1.25),
       cursor: 'pointer',
       transition: 'all 0.2s ease',
-
+      marginBottom: theme.spacing(1),
+      backgroundColor: theme.palette.background.paper,
 
       '&:hover': {
         backgroundColor: theme.palette.action.hover
@@ -211,13 +168,39 @@ const ContactsList = () => {
     }
   }
 
+  const fetchContacts = async () => {
+    try {
+      setLoading(true)
+      const res = await api.get('/users', { params: { search: searchQuery } })
+      setContacts(res.data.data || [])
+      setError('')
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Unable to load contacts')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchContacts()
+  }, [searchQuery])
+
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue)
   }
 
+  const getAvatarText = (name) => {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase()
+  }
+
   return (
     <Box sx={styles.root}>
-      {/* ── HEADER ────────────────────────── */}
       <Box sx={styles.header}>
         <Box sx={styles.headerTop}>
           <Typography sx={styles.headerTitle}>Contacts</Typography>
@@ -248,7 +231,6 @@ const ContactsList = () => {
         />
       </Box>
 
-      {/* ── TABS ────────────────────────── */}
       <Tabs
         value={tabValue}
         onChange={handleTabChange}
@@ -264,82 +246,55 @@ const ContactsList = () => {
         <Tab label="Groups" />
       </Tabs>
 
-      {/* ── CONTENT ────────────────────── */}
       <Box sx={styles.content}>
-        {/* Favorites Section */}
-        <Box sx={styles.section}>
-          <Typography sx={styles.sectionTitle}>⭐ Favorites</Typography>
-          <Box sx={styles.favoritesContainer}>
-            {FAVORITES.map((contact) => (
-              <Card
-                key={contact.id}
-                sx={styles.favoriteCard}
-              >
+        <Typography sx={styles.sectionTitle}>All Contacts ({contacts.length})</Typography>
+
+        {error && (
+          <Typography color="error" sx={{ marginBottom: theme.spacing(2) }}>
+            {error}
+          </Typography>
+        )}
+
+        <Box sx={styles.section2}>
+          {loading ? (
+            <Typography sx={{ color: theme.palette.text.secondary, padding: theme.spacing(2) }}>
+              Loading contacts...
+            </Typography>
+          ) : contacts.length === 0 ? (
+            <Typography sx={{ color: theme.palette.text.secondary, padding: theme.spacing(2) }}>
+              No contacts found.
+            </Typography>
+          ) : (
+            contacts.map((contact) => (
+              <Box key={contact._id} sx={styles.contactItem}>
                 <Badge
                   overlap="circular"
                   anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                   variant="dot"
                   sx={{
                     '& .MuiBadge-badge': {
-                      backgroundColor: contact.online ? '#10b981' : '#d1d5db',
+                      backgroundColor: '#10b981',
                       width: 10,
                       height: 10
                     }
                   }}
                 >
-                  <Avatar sx={{ ...styles.avatar, margin: '0 auto 12px' }}>
-                    {contact.avatar}
+                  <Avatar sx={styles.avatar}>
+                    {getAvatarText(contact.fullName)}
                   </Avatar>
                 </Badge>
-                <Typography sx={styles.contactName}>
-                  {contact.name}
-                </Typography>
-                <Typography sx={styles.contactRole}>
-                  {contact.role}
-                </Typography>
-              </Card>
-            ))}
-          </Box>
+                <Box sx={styles.contactInfo}>
+                  <Typography sx={styles.contactName}>{contact.fullName}</Typography>
+                  <Typography sx={styles.contactRole}>{contact.email}</Typography>
+                </Box>
+              </Box>
+            ))
+          )}
         </Box>
 
-        {/* All Contacts Section */}
-         <Typography sx={styles.sectionTitle}>
-            All Contacts ({CONTACTS_DATA.length} total)
-          </Typography>
-        <Box sx={styles.section2}>
-         
-          {CONTACTS_DATA.map((contact) => (
-            <Box key={contact.id} sx={styles.contactItem}>
-              <Badge
-                overlap="circular"
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                variant="dot"
-                sx={{
-                  '& .MuiBadge-badge': {
-                    backgroundColor: contact.online ? '#10b981' : '#d1d5db',
-                    width: 10,
-                    height: 10
-                  }
-                }}
-              >
-                <Avatar sx={styles.avatar}>
-                  {contact.avatar}
-                </Avatar>
-              </Badge>
-              <Box sx={styles.contactInfo}>
-                <Typography sx={styles.contactName}>
-                  {contact.name}
-                </Typography>
-                <Typography sx={styles.contactRole}>
-                  {contact.role}
-                </Typography>
-              </Box>
-            </Box>
-          ))}
-        </Box>
-         <Button sx={styles.loadMoreButton}>
-            Load more contacts
-          </Button>
+        <Button sx={styles.loadMoreButton}>
+          Load more contacts
+        </Button>
       </Box>
     </Box>
   )
